@@ -10,10 +10,9 @@ use Yii;
 use yii\db\Migration;
 
 /**
- * M210528114233Parent adds the necessary columns to {@see Entry}. This migration is not automatically added to the
- * migration namespaces and must be either manually added or extended by a migration on application level.
+ * M220510144659Parent adds the necessary columns to {@see Entry}.
  */
-class M210528114233Parent extends Migration
+class M220510144659Parent extends Migration
 {
     use MigrationTrait;
     use ModuleTrait;

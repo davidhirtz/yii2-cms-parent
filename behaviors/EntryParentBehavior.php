@@ -3,21 +3,25 @@
 namespace davidhirtz\yii2\cms\parent\behaviors;
 
 use davidhirtz\yii2\cms\models\Entry;
+use davidhirtz\yii2\cms\parent\composer\Bootstrap;
 use davidhirtz\yii2\cms\parent\validators\ParentIdValidator;
 use davidhirtz\yii2\skeleton\helpers\ArrayHelper;
 use davidhirtz\yii2\skeleton\validators\UniqueValidator;
-use Yii;
 use yii\base\Behavior;
 use yii\db\AfterSaveEvent;
 
 /**
- * EntryParentBehavior is needed by {@see Entry} to enhance it with parent id functionality
+ * EntryParentBehavior extends {@see Entry} by providing 'parent_id` validation and manipulation. This behavior is
+ * attached on startup by {@see Bootstrap}.
  *
  * @property Entry $owner
  */
 class EntryParentBehavior extends Behavior
 {
-    public function events()
+    /**
+     * @return array
+     */
+    public function events(): array
     {
         return [
             Entry::EVENT_INIT => 'onInit',
@@ -73,6 +77,7 @@ class EntryParentBehavior extends Behavior
                 array_key_exists('parent_slug', $event->changedAttributes)) {
                 foreach ($this->owner->getChildren(true) as $entry) {
                     $entry->path = ArrayHelper::createCacheString(ArrayHelper::cacheStringToArray($this->owner->path, $this->owner->id));
+                    /** @noinspection PhpUndefinedMethodInspection */
                     $entry->parent_slug = $this->owner->getFormattedSlug();
                     $entry->update();
                 }
@@ -84,6 +89,7 @@ class EntryParentBehavior extends Behavior
 
             if ($ancestorIds) {
                 foreach ($this->owner::findAll($ancestorIds) as $ancestor) {
+                    /** @noinspection PhpPossiblePolymorphicInvocationInspection */
                     $ancestor->recalculateEntryCount()->update();
                 }
             }
@@ -111,6 +117,7 @@ class EntryParentBehavior extends Behavior
         if (!$this->owner->getIsBatch()) {
             if ($this->owner->parent_id) {
                 foreach ($this->owner->getAncestors() as $ancestor) {
+                    /** @noinspection PhpUndefinedMethodInspection */
                     $ancestor->recalculateEntryCount()->update();
                 }
             }
@@ -132,7 +139,6 @@ class EntryParentBehavior extends Behavior
     public function recalculateEntryCount()
     {
         $this->owner->entry_count = $this->owner->findDescendants()->count();
-        Yii::debug("New Count {$this->owner->entry_count}");
         return $this->owner;
     }
 
@@ -142,6 +148,15 @@ class EntryParentBehavior extends Behavior
     public function getFormattedSlug()
     {
         return substr(trim($this->owner->parent_slug . '/' . $this->owner->slug, '/'), 0, 255);
+    }
+
+    /**
+     * Fallback method if not implemented by {@link Entry}.
+     * @return bool
+     */
+    public function hasParentEnabled(): bool
+    {
+        return true;
     }
 
     /**

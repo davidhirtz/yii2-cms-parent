@@ -13,6 +13,9 @@
       "davidhirtz\\yii2\\cms\\parent\\": ""
     }
   },
+  "extra": {
+    "bootstrap": "davidhirtz\\yii2\\cms\\parent\\composer\\Bootstrap"
+  },
   "repositories": [
     {
       "type": "git",
