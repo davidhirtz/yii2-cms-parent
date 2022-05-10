@@ -22,6 +22,26 @@ class ParentIdFieldBehavior extends Behavior
     private $_parentIdItems = [];
 
     /**
+     * @return string[]
+     */
+    public function events()
+    {
+        return [
+            EntryActiveForm::EVENT_BEFORE_RUN => 'onBeforeRun',
+        ];
+    }
+
+    /**
+     * Sets default values via GET parameters.
+     */
+    public function onBeforeRun()
+    {
+        if ($this->owner->model->getIsNewRecord() && !$this->owner->model->hasErrors()) {
+            $this->owner->model->parent_id = Yii::$app->getRequest()->get('parent');
+        }
+    }
+
+    /**
      * @return string
      */
     public function parentIdField()
@@ -47,7 +67,7 @@ class ParentIdFieldBehavior extends Behavior
                     'options' => ['data-value' => $this->owner->getSlugBaseUrl()],
                 ],
             ];
-            
+
             foreach ($entries as $entry) {
                 $options['options'][$entry->id]['data-value'] = Yii::$app->getUrlManager()->createAbsoluteUrl($entry->getRoute()) . '/';
 
@@ -56,6 +76,7 @@ class ParentIdFieldBehavior extends Behavior
                 }
             }
 
+            /** @noinspection PhpUndefinedMethodInspection */
             return $this->owner->field($this->owner->model, 'parent_id')->dropdownList($this->owner->getParentIdItems($entries), $options);
         }
 
@@ -67,19 +88,20 @@ class ParentIdFieldBehavior extends Behavior
      * @param null $parentId
      * @return array
      */
-    protected function getParentIdItems($entries, $parentId = null)
+    public function getParentIdItems($entries, $parentId = null)
     {
         foreach ($entries as $entry) {
             if ($entry->parent_id == $parentId) {
                 $count = count($entry->getAncestorIds());
-                $this->owner->_parentIdItems[$entry->id] = ($count ? ("&nbsp;" . str_repeat("–", $count) . ' ') : '') . Html::encode($entry->getI18nAttribute('name'));
+                $this->_parentIdItems[$entry->id] = ($count ? ("&nbsp;" . str_repeat("–", $count) . ' ') : '') . Html::encode($entry->getI18nAttribute('name'));
 
                 if ($entry->entry_count) {
+                    /** @noinspection PhpUndefinedMethodInspection */
                     $this->owner->getParentIdItems($entries, $entry->id);
                 }
             }
         }
 
-        return $this->owner->_parentIdItems;
+        return $this->_parentIdItems;
     }
 }

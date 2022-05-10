@@ -3,7 +3,7 @@
 namespace davidhirtz\yii2\cms\parent\composer;
 
 use davidhirtz\yii2\cms\models\Entry;
-use davidhirtz\yii2\cms\modules\admin\widgets\grid\EntryGridView;
+use davidhirtz\yii2\cms\modules\admin\widgets\forms\EntryActiveForm;
 use davidhirtz\yii2\cms\parent\behaviors\EntryParentBehavior;
 use davidhirtz\yii2\cms\parent\behaviors\ParentIdFieldBehavior;
 use davidhirtz\yii2\skeleton\web\Application;
@@ -27,10 +27,10 @@ class Bootstrap implements BootstrapInterface
             $entry->attachBehavior('EntryParentBehavior', EntryParentBehavior::class);
         });
 
-        Event::on(EntryGridView::class, EntryGridView::EVENT_INIT, function (Event $event) {
-            /** @var EntryGridView $entry */
-            $entry = $event->sender;
-            $entry->attachBehavior('ParentIdFieldBehavior', ParentIdFieldBehavior::class);
+        Event::on(EntryActiveForm::class, EntryActiveForm::EVENT_INIT, function (Event $event) {
+            /** @var EntryActiveForm $form */
+            $form = $event->sender;
+            $form->attachBehavior('ParentIdFieldBehavior', ParentIdFieldBehavior::class);
         });
 
         $app->setMigrationNamespace('davidhirtz\yii2\cms\parent\migrations');

@@ -7,6 +7,7 @@ use davidhirtz\yii2\cms\parent\composer\Bootstrap;
 use davidhirtz\yii2\cms\parent\validators\ParentIdValidator;
 use davidhirtz\yii2\skeleton\helpers\ArrayHelper;
 use davidhirtz\yii2\skeleton\validators\UniqueValidator;
+use Yii;
 use yii\base\Behavior;
 use yii\db\AfterSaveEvent;
 
@@ -24,7 +25,6 @@ class EntryParentBehavior extends Behavior
     public function events(): array
     {
         return [
-            Entry::EVENT_INIT => 'onInit',
             Entry::EVENT_CREATE_VALIDATORS => 'onCreateValidators',
             Entry::EVENT_AFTER_VALIDATE => 'onAfterValidate',
             Entry::EVENT_AFTER_INSERT => 'onAfterSave',
@@ -32,17 +32,6 @@ class EntryParentBehavior extends Behavior
             Entry::EVENT_BEFORE_DELETE => 'onBeforeDelete',
             Entry::EVENT_AFTER_DELETE => 'onAfterDelete',
         ];
-    }
-
-    /**
-     * Sets default slug validation targets. If other target attributes are needed, simply override the property
-     * {@see Entry::$slugTargetAttribute}, but make sure the database unique key is altered accordingly.
-     */
-    public function onInit()
-    {
-        if ($this->owner->slugTargetAttribute === null) {
-            $this->owner->slugTargetAttribute = ['slug', 'parent_slug'];
-        }
     }
 
     /**
@@ -155,6 +144,15 @@ class EntryParentBehavior extends Behavior
      * @return bool
      */
     public function hasParentEnabled(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Fallback method if not implemented by {@link Entry}.
+     * @return bool
+     */
+    public function hasDescendantsEnabled(): bool
     {
         return true;
     }
