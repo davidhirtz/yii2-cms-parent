@@ -37,6 +37,30 @@ class EntryCountColumn extends DataColumn
     ];
 
     /**
+     * @var bool|null if set to null the column will only show if at least one model has descendants enabled
+     */
+    public $visible = null;
+
+    /**
+     * @return void
+     */
+    public function init()
+    {
+        if ($this->visible === null) {
+            $this->visible = false;
+
+            foreach ($this->grid->dataProvider->getModels() as $model) {
+                if ($model->hasDescendantsEnabled()) {
+                    $this->visible = true;
+                    break;
+                }
+            }
+        }
+
+        parent::init();
+    }
+
+    /**
      * @param Entry $model
      * @param string $key
      * @param int $index
@@ -45,6 +69,6 @@ class EntryCountColumn extends DataColumn
     protected function renderDataCellContent($model, $key, $index)
     {
         $url = Url::current(['parent' => $model->id, 'type' => null, 'q' => null]);
-        return Html::a(Yii::$app->getFormatter()->asInteger($model->getAttribute($key)), $url, ['class' => 'badge']);
+        return Html::a(Yii::$app->getFormatter()->asInteger($this->getDataCellValue($model, $key, $index)), $url, ['class' => 'badge']);
     }
 }
