@@ -10,8 +10,8 @@ use Yii;
 use yii\base\Behavior;
 
 /**
- * ParentIdFieldTrait can be used by {@see EntryActiveForm} to add a `parent_id` select field. This behavior is
- * attached on startup by {@see Bootstrap}.
+ * ParentIdFieldTrait can be used by {@see EntryActiveForm} to add a `parent_id` select field. All methods in this
+ * behavior can be overridden by the owner. This behavior is attached on startup by {@see Bootstrap}.
  *
  * @property EntryActiveForm $owner
  */
@@ -43,48 +43,71 @@ class ParentIdFieldBehavior extends Behavior
     }
 
     /**
+     * @noinspection PhpUndefinedMethodInspection
      * @return string
      */
     public function parentIdField()
     {
-        if (!$this->owner->model->hasParentEnabled()) {
-            return '';
-        }
-
-        $entries = Entry::find()
-            ->select(['id', 'parent_id', 'name', 'path', 'slug', 'parent_slug', 'entry_count'])
-            ->replaceI18nAttributes()
-            ->hasDescendantsEnabled()
-            ->orderBy(['position' => SORT_ASC])
-            ->indexBy('id')
-            ->all();
-
-        if ($entries) {
-            $options = [
-                'data-form-target' => [$this->owner->getSlugId()],
-                'encode' => false,
-                'prompt' => [
-                    'text' => '',
-                    'options' => ['data-value' => $this->owner->getSlugBaseUrl()],
-                ],
-            ];
-
-            foreach ($entries as $entry) {
-                $options['options'][$entry->id]['data-value'] = Yii::$app->getUrlManager()->createAbsoluteUrl($entry->getRoute()) . '/';
-
-                if (!$this->owner->model->getIsNewRecord() && in_array($this->owner->model->id, array_merge($entry->getAncestorIds(), [$entry->id]))) {
-                    $options['options'][$entry->id]['disabled'] = true;
-                }
+        if ($this->owner->model->hasParentEnabled()) {
+            if ($entries = $this->owner->findParentEntries()) {
+                return $this->owner->field($this->owner->model, 'parent_id')->dropdownList($this->owner->getParentIdItems($entries), $this->owner->getParentIdOptions($entries));
             }
-
-            /** @noinspection PhpUndefinedMethodInspection */
-            return $this->owner->field($this->owner->model, 'parent_id')->dropdownList($this->owner->getParentIdItems($entries), $options);
         }
 
         return '';
     }
 
     /**
+     * @return Entry[]
+     */
+    public function findParentEntries()
+    {
+        return Entry::find()
+            ->select(['id', 'parent_id', 'name', 'path', 'slug', 'parent_slug', 'entry_count'])
+            ->replaceI18nAttributes()
+            ->orderBy(['position' => SORT_ASC])
+            ->indexBy('id')
+            ->all();
+    }
+
+    /**
+     * @noinspection PhpUndefinedMethodInspection
+     * @param Entry[] $entries
+     * @return array
+     */
+    public function getParentIdOptions($entries)
+    {
+        $options = [
+            'data-form-target' => [$this->owner->getSlugId()],
+            'encode' => false,
+            'prompt' => [
+                'text' => '',
+                'options' => ['data-value' => $this->owner->getSlugBaseUrl()],
+            ],
+        ];
+
+        foreach ($entries as $entry) {
+            $options['options'][$entry->id]['data-value'] = $this->owner->getParentIdOptionDataValue($entry);
+
+            if (!$this->owner->model->getIsNewRecord() && in_array($this->owner->model->id, array_merge($entry->getAncestorIds(), [$entry->id]))) {
+                $options['options'][$entry->id]['disabled'] = true;
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * @param Entry $entry
+     * @return string
+     */
+    public function getParentIdOptionDataValue($entry)
+    {
+        return Yii::$app->getUrlManager()->createAbsoluteUrl($entry->getRoute()) . '/';
+    }
+
+    /**
+     * @noinspection PhpUndefinedMethodInspection
      * @param Entry[] $entries
      * @param null $parentId
      * @return array
@@ -97,7 +120,6 @@ class ParentIdFieldBehavior extends Behavior
                 $this->_parentIdItems[$entry->id] = ($count ? ("&nbsp;" . str_repeat("–", $count) . ' ') : '') . Html::encode($entry->getI18nAttribute('name'));
 
                 if ($entry->entry_count) {
-                    /** @noinspection PhpUndefinedMethodInspection */
                     $this->owner->getParentIdItems($entries, $entry->id);
                 }
             }
