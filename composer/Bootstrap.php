@@ -4,8 +4,8 @@ namespace davidhirtz\yii2\cms\parent\composer;
 
 use davidhirtz\yii2\cms\models\Entry;
 use davidhirtz\yii2\cms\modules\admin\widgets\forms\EntryActiveForm;
-use davidhirtz\yii2\cms\parent\behaviors\EntryParentBehavior;
-use davidhirtz\yii2\cms\parent\behaviors\ParentIdFieldBehavior;
+use davidhirtz\yii2\cms\parent\models\behaviors\EntryParentBehavior;
+use davidhirtz\yii2\cms\parent\widgets\forms\behaviors\ParentIdFieldBehavior;
 use davidhirtz\yii2\skeleton\web\Application;
 use yii\base\BootstrapInterface;
 use yii\base\Event;

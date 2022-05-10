@@ -2,7 +2,7 @@
 
 namespace davidhirtz\yii2\cms\parent\validators;
 
-use davidhirtz\yii2\cms\parent\behaviors\EntryParentBehavior;
+use davidhirtz\yii2\cms\parent\models\behaviors\EntryParentBehavior;
 use davidhirtz\yii2\cms\models\Entry;
 use yii\base\NotSupportedException;
 use yii\validators\Validator;

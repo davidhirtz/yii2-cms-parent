@@ -1,13 +1,12 @@
 <?php
 
-namespace davidhirtz\yii2\cms\parent\behaviors;
+namespace davidhirtz\yii2\cms\parent\models\behaviors;
 
 use davidhirtz\yii2\cms\models\Entry;
 use davidhirtz\yii2\cms\parent\composer\Bootstrap;
 use davidhirtz\yii2\cms\parent\validators\ParentIdValidator;
 use davidhirtz\yii2\skeleton\helpers\ArrayHelper;
 use davidhirtz\yii2\skeleton\validators\UniqueValidator;
-use Yii;
 use yii\base\Behavior;
 use yii\db\AfterSaveEvent;
 

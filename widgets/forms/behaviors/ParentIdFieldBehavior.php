@@ -1,6 +1,6 @@
 <?php
 
-namespace davidhirtz\yii2\cms\parent\behaviors;
+namespace davidhirtz\yii2\cms\parent\widgets\forms\behaviors;
 
 use davidhirtz\yii2\cms\models\Entry;
 use davidhirtz\yii2\cms\modules\admin\widgets\forms\EntryActiveForm;
