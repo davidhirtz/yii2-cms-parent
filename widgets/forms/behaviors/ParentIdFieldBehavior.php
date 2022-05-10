@@ -4,13 +4,14 @@ namespace davidhirtz\yii2\cms\parent\widgets\forms\behaviors;
 
 use davidhirtz\yii2\cms\models\Entry;
 use davidhirtz\yii2\cms\modules\admin\widgets\forms\EntryActiveForm;
+use davidhirtz\yii2\cms\parent\composer\Bootstrap;
 use davidhirtz\yii2\skeleton\helpers\Html;
 use Yii;
 use yii\base\Behavior;
 
 /**
- * ParentIdFieldTrait can be used by {@see EntryActiveForm} to add a `parent_id` select field. It only shows products that
- * are not already linked to another entry.
+ * ParentIdFieldTrait can be used by {@see EntryActiveForm} to add a `parent_id` select field. This behavior is
+ * attached on startup by {@see Bootstrap}.
  *
  * @property EntryActiveForm $owner
  */
