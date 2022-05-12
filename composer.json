@@ -15,11 +15,5 @@
   },
   "extra": {
     "bootstrap": "davidhirtz\\yii2\\cms\\parent\\composer\\Bootstrap"
-  },
-  "repositories": [
-    {
-      "type": "git",
-      "url": "git@github.com:davidhirtz/yii2-cms.git"
-    }
-  ]
+  }
 }
