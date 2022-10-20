@@ -50,7 +50,8 @@ class ParentIdFieldBehavior extends Behavior
     {
         if ($this->owner->model->hasParentEnabled()) {
             if ($entries = $this->owner->findParentEntries()) {
-                return $this->owner->field($this->owner->model, 'parent_id')->dropdownList($this->owner->getParentIdItems($entries), $this->owner->getParentIdOptions($entries));
+                return $this->owner->field($this->owner->model, 'parent_id')
+                    ->dropdownList($this->owner->getParentIdItems($entries), $this->owner->getParentIdOptions($entries));
             }
         }
 
@@ -58,19 +59,26 @@ class ParentIdFieldBehavior extends Behavior
     }
 
     /**
+     * Returns the entries that can be used as parent entries. This can be overridden by the entry's active form class.
      * @return Entry[]
      */
     public function findParentEntries()
     {
-        return Entry::find()
+        $entries = Entry::find()
             ->select(['id', 'parent_id', 'name', 'path', 'slug', 'parent_slug', 'entry_count'])
             ->replaceI18nAttributes()
             ->orderBy(['position' => SORT_ASC])
             ->indexBy('id')
             ->all();
+
+        return array_filter($entries, function (Entry $entry) {
+            return $entry->hasDescendantsEnabled();
+        });
     }
 
     /**
+     * Returns the select options form the parent dropdown. This can be overridden by the entry's active form class.
+     *
      * @noinspection PhpUndefinedMethodInspection
      * @param Entry[] $entries
      * @return array
