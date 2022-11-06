@@ -11,7 +11,7 @@ use yii\base\Behavior;
 use yii\db\AfterSaveEvent;
 
 /**
- * EntryParentBehavior extends {@see Entry} by providing 'parent_id` validation and manipulation. This behavior is
+ * EntryParentBehavior extends {@see Entry} by providing `parent_id` validation and manipulation. This behavior is
  * attached on startup by {@see Bootstrap}.
  *
  * @property Entry $owner
@@ -128,6 +128,14 @@ class EntryParentBehavior extends Behavior
     {
         $this->owner->entry_count = $this->owner->findDescendants()->count();
         return $this->owner;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDescendantsOrder(): array
+    {
+        return ['position' => SORT_ASC];
     }
 
     /**

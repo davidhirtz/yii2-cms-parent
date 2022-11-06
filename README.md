@@ -19,7 +19,7 @@ SETUP
 -------------
 
 - Extend the default entry model `davidhirtz\yii2\cms\models\Entry`: It must make use of the`davidhirtz\yii2\skeleton\db\MaterializedTreeTrait` trait, otherwise the application will throw an error
+- Override `Entry::find()` to return an instance of `davidhirtz\yii2\cms\parent\models\queries\EntryQuery` instead of `davidhirtz\yii2\cms\models\queries\EntryQuery`
 - Make sure `app\modules\admin\widgets\forms\EntryActiveForm::$fields` includes `parent_id` to display the entries drop down
 - [Optional] Use `davidhirtz\yii2\cms\parent\widgets\grid\columns\EntryCountColumn` to display an entries counter in `davidhirtz\yii2\cms\modules\admin\widgets\grid\EntryGridView`
 - [Optional] Use `davidhirtz\yii2\cms\parent\widgets\nav\ParentSubmenuTrait` in `davidhirtz\yii2\cms\modules\admin\widgets\nav\Submenu`, follow the documention of the trait methods
-

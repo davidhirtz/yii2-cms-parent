@@ -4,6 +4,7 @@ namespace davidhirtz\yii2\cms\parent\widgets\forms\behaviors;
 
 use davidhirtz\yii2\cms\models\Entry;
 use davidhirtz\yii2\cms\modules\admin\widgets\forms\EntryActiveForm;
+use davidhirtz\yii2\cms\modules\ModuleTrait;
 use davidhirtz\yii2\cms\parent\composer\Bootstrap;
 use davidhirtz\yii2\skeleton\helpers\Html;
 use Yii;
@@ -17,6 +18,8 @@ use yii\base\Behavior;
  */
 class ParentIdFieldBehavior extends Behavior
 {
+    use ModuleTrait;
+
     /**
      * @var array
      */
@@ -67,7 +70,8 @@ class ParentIdFieldBehavior extends Behavior
         $entries = Entry::find()
             ->select(['id', 'parent_id', 'name', 'path', 'slug', 'parent_slug', 'entry_count'])
             ->replaceI18nAttributes()
-            ->orderBy(['position' => SORT_ASC])
+            ->whereHasDescendantsEnabled()
+            ->orderBy(static::getModule()->defaultEntryOrderBy)
             ->indexBy('id')
             ->all();
 

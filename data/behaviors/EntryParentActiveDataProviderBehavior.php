@@ -43,6 +43,10 @@ class EntryParentActiveDataProviderBehavior extends Behavior
                 }
             }
 
+            if($this->owner->parent) {
+                $this->owner->query->orderBy($this->owner->parent->getDescendantsOrder());
+            }
+
             $this->owner->query->andWhere(['parent_id' => $this->owner->parent->id ?? null]);
         }
     }

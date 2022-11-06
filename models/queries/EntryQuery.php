@@ -17,6 +17,14 @@ class EntryQuery extends \davidhirtz\yii2\cms\models\queries\EntryQuery
     }
 
     /**
+     * @return $this
+     */
+    public function whereHasDescendantsEnabled()
+    {
+        return $this;
+    }
+
+    /**
      * @param string $slug
      * @return EntryQuery
      */
