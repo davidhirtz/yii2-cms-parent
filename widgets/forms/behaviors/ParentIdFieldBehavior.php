@@ -115,7 +115,7 @@ class ParentIdFieldBehavior extends Behavior
      */
     public function getParentIdOptionDataValue($entry)
     {
-        return Yii::$app->getUrlManager()->createAbsoluteUrl($entry->getRoute()) . '/';
+        return rtrim(Yii::$app->getUrlManager()->createAbsoluteUrl($entry->getRoute()), '/') . '/';
     }
 
     /**
