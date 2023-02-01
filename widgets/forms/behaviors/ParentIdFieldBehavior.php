@@ -68,8 +68,7 @@ class ParentIdFieldBehavior extends Behavior
     public function findParentEntries()
     {
         $entries = Entry::find()
-            ->select(['id', 'parent_id', 'name', 'path', 'slug', 'parent_slug', 'entry_count'])
-            ->replaceI18nAttributes()
+            ->select($this->owner->model->getI18nAttributesNames(['id', 'parent_id', 'name', 'path', 'slug', 'parent_slug', 'entry_count']))
             ->whereHasDescendantsEnabled()
             ->orderBy(static::getModule()->defaultEntryOrderBy)
             ->indexBy('id')
@@ -90,16 +89,19 @@ class ParentIdFieldBehavior extends Behavior
     public function getParentIdOptions($entries)
     {
         $options = [
-            'data-form-target' => [$this->owner->getSlugId()],
             'encode' => false,
-            'prompt' => [
-                'text' => '',
-                'options' => ['data-value' => $this->owner->getSlugBaseUrl()],
-            ],
+            'prompt' => ['text' => ''],
         ];
 
+        foreach ($this->owner->model->getI18nAttributeNames('slug') as $language => $attribute) {
+            $options['data-form-target'][] = $this->owner->getSlugId($language);
+            $options['prompt']['options']['data-value'][] = $this->owner->getSlugBaseUrl($language);
+        }
+
         foreach ($entries as $entry) {
-            $options['options'][$entry->id]['data-value'] = $this->owner->getParentIdOptionDataValue($entry);
+            foreach ($this->owner->model->getI18nAttributeNames('slug') as $language => $attribute) {
+                $options['options'][$entry->id]['data-value'][] = $this->owner->getParentIdOptionDataValue($entry, $language);
+            }
 
             if (!$this->owner->model->getIsNewRecord() && in_array($this->owner->model->id, array_merge($entry->getAncestorIds(), [$entry->id]))) {
                 $options['options'][$entry->id]['disabled'] = true;
@@ -113,9 +115,11 @@ class ParentIdFieldBehavior extends Behavior
      * @param Entry $entry
      * @return string
      */
-    public function getParentIdOptionDataValue($entry)
+    public function getParentIdOptionDataValue($entry, $language = null)
     {
-        return rtrim(Yii::$app->getUrlManager()->createAbsoluteUrl($entry->getRoute()), '/') . '/';
+        return Yii::$app->getI18n()->callback($language, function () use ($entry) {
+            return rtrim(Yii::$app->getUrlManager()->createAbsoluteUrl($entry->getRoute()), '/') . '/';
+        });
     }
 
     /**

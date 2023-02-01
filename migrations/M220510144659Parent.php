@@ -23,20 +23,27 @@ class M220510144659Parent extends Migration
     public function safeUp()
     {
         $schema = $this->getDb()->getSchema();
+        $entry = Entry::instance();
 
         foreach ($this->getLanguages() as $language) {
-            if ($language) {
-                Yii::$app->language = $language;
-            }
+            Yii::$app->language = $language;
 
             $this->addColumn(Entry::tableName(), 'parent_id', $this->integer()->unsigned()->null()->after('type'));
             $this->addColumn(Entry::tableName(), 'path', $this->string()->null()->after('position'));
-            $this->addColumn(Entry::tableName(), 'parent_slug', $this->string()->notNull()->defaultValue('')->after('slug'));
             $this->addColumn(Entry::tableName(), 'entry_count', $this->integer()->unsigned()->notNull()->defaultValue(0)->after('category_ids'));
 
-            if ($slugTargetAttribute = (new Entry())->slugTargetAttribute) {
+            $this->addColumn(Entry::tableName(), 'parent_slug', $this->string()->notNull()->defaultValue('')->after('slug'));
+
+            if ($entry->isI18nAttribute('parent_slug')) {
+                $this->addI18nColumns(Entry::tableName(), 'parent_slug');
+            }
+
+            if ($slugTargetAttribute = $entry->slugTargetAttribute) {
                 $this->dropSlugIndex();
-                $this->createIndex('slug', Entry::tableName(), $slugTargetAttribute, true);
+
+                foreach ($entry->getI18nAttributeNames('slug') as $language => $indexName) {
+                    $this->createIndex($indexName, Entry::tableName(), $entry->getI18nAttributesNames($slugTargetAttribute, [$language]), true);
+                }
             }
 
             $tableName = $schema->getRawTableName(Entry::tableName());
@@ -50,18 +57,26 @@ class M220510144659Parent extends Migration
     public function safeDown()
     {
         $schema = $this->getDb()->getSchema();
+        $entry = Entry::instance();
 
         foreach ($this->getLanguages() as $language) {
             Yii::$app->language = $language;
 
             $this->dropSlugIndex();
 
+            foreach ($entry->getI18nAttributeNames('slug') as $attributeName) {
+                $this->createIndex($attributeName, Entry::tableName(), $attributeName);
+            }
+
+            foreach ($entry->getI18nAttributeNames('parent_slug') as $attributeName) {
+                $this->dropColumn(Entry::tableName(), $attributeName);
+            }
+
             $tableName = $schema->getRawTableName(Entry::tableName());
             $this->dropForeignKey($tableName . '_parent_id', Entry::tableName());
 
             $this->dropColumn(Entry::tableName(), 'parent_id');
             $this->dropColumn(Entry::tableName(), 'path');
-            $this->dropColumn(Entry::tableName(), 'parent_slug');
             $this->dropColumn(Entry::tableName(), 'entry_count');
         }
     }
@@ -71,9 +86,13 @@ class M220510144659Parent extends Migration
      */
     protected function dropSlugIndex()
     {
-        try {
-            $this->dropIndex('slug', Entry::tableName());
-        } catch (Exception $exception) {
+        $entry = Entry::instance();
+
+        foreach ($entry->getI18nAttributeNames('slug') as $attributeName) {
+            try {
+                $this->dropIndex($attributeName, Entry::tableName());
+            } catch (Exception $ex) {
+            }
         }
     }
 

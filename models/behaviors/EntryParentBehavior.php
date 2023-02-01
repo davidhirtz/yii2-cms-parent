@@ -60,14 +60,19 @@ class EntryParentBehavior extends Behavior
     public function onAfterSave($event)
     {
         if ($this->owner->entry_count) {
-            if (array_key_exists('path', $event->changedAttributes) ||
-                array_key_exists('slug', $event->changedAttributes) ||
-                array_key_exists('parent_slug', $event->changedAttributes)) {
-                foreach ($this->owner->getChildren(true) as $entry) {
-                    $entry->path = ArrayHelper::createCacheString(ArrayHelper::cacheStringToArray($this->owner->path, $this->owner->id));
-                    /** @noinspection PhpUndefinedMethodInspection */
-                    $entry->parent_slug = $this->owner->getFormattedSlug();
-                    $entry->update();
+            foreach ($this->owner->getI18nAttributesNames(['path', 'slug', 'parent_slug']) as $key) {
+                if (array_key_exists($key, $event->changedAttributes)) {
+                    foreach ($this->owner->getChildren(true) as $entry) {
+                        foreach ($entry->getI18nAttributeNames('parent_slug') as $language => $attributeName) {
+                            /** @noinspection PhpUndefinedMethodInspection */
+                            $entry->{$attributeName} = $this->owner->getFormattedSlug($language);
+                        }
+
+                        $entry->path = ArrayHelper::createCacheString(ArrayHelper::cacheStringToArray($this->owner->path, $this->owner->id));
+                        $entry->update();
+                    }
+
+                    break;
                 }
             }
         }
@@ -77,7 +82,7 @@ class EntryParentBehavior extends Behavior
 
             if ($ancestorIds) {
                 foreach ($this->owner::findAll($ancestorIds) as $ancestor) {
-                    /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+                    /** @noinspection PhpUndefinedMethodInspection */
                     $ancestor->recalculateEntryCount()->update();
                 }
             }
@@ -139,11 +144,13 @@ class EntryParentBehavior extends Behavior
     }
 
     /**
+     * @param string|null $language
      * @return string
      */
-    public function getFormattedSlug()
+    public function getFormattedSlug($language = null)
     {
-        return substr(trim($this->owner->parent_slug . '/' . $this->owner->slug, '/'), 0, 255);
+        $slug = $this->owner->getI18nAttribute('parent_slug', $language) . '/' . $this->owner->getI18nAttribute('slug', $language);
+        return substr(trim($slug, '/'), 0, 255);
     }
 
     /**

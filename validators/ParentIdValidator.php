@@ -35,20 +35,25 @@ class ParentIdValidator extends Validator
      */
     public function validateAttribute($model, $attribute)
     {
-        $model->setAttribute($attribute,  $model->hasParentEnabled() && $model->getAttribute($attribute) ? (int)$model->getAttribute($attribute) : null);
+        $model->setAttribute($attribute, $model->hasParentEnabled() && $model->getAttribute($attribute) ? (int)$model->getAttribute($attribute) : null);
 
         if ($model->isAttributeChanged($attribute)) {
             if ($parentId = $model->getAttribute($attribute)) {
                 if ((!$model->parent || $model->parent->id != $parentId) && !$model->refreshRelation('parent')) {
                     $model->addInvalidAttributeError($attribute);
                 } else {
-                    $model->parent_slug = $model->parent->getFormattedSlug();
+                    foreach ($model->getI18nAttributeNames('parent_slug') as $language => $attributeName) {
+                        /** @noinspection PhpUndefinedMethodInspection */
+                        $model->{$attributeName} = $model->parent->getFormattedSlug($language);
+                    }
                 }
             }
         }
 
         if (!$model->getAttribute($attribute)) {
-            $model->parent_slug = '';
+            foreach ($model->getI18nAttributeNames('parent_slug') as $attributeName) {
+                $model->{$attributeName} = '';
+            }
         }
     }
 
