@@ -4,6 +4,7 @@ namespace davidhirtz\yii2\cms\parent\widgets\nav;
 
 use davidhirtz\yii2\cms\models\Entry;
 use davidhirtz\yii2\cms\modules\admin\widgets\nav\Submenu;
+use davidhirtz\yii2\cms\parent\helpers\EntryParentFromRequest;
 use Yii;
 
 /**
@@ -19,14 +20,9 @@ trait ParentSubmenuTrait
      */
     public function setEntryFromRequest()
     {
-        if (!$this->model) {
-            if ($parent = Yii::$app->getRequest()->get('parent')) {
-                $this->model = Entry::findOne((int)$parent);
-            }
-        }
-
-        // Remove parent from GET params
+        $this->model ??= EntryParentFromRequest::getParent();
         $this->params['parent'] = null;
+
         return $this->model;
     }
 

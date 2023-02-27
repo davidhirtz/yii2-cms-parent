@@ -5,6 +5,7 @@ namespace davidhirtz\yii2\cms\parent\data\behaviors;
 use davidhirtz\yii2\cms\models\Entry;
 use davidhirtz\yii2\cms\modules\admin\data\EntryActiveDataProvider;
 use davidhirtz\yii2\cms\parent\composer\Bootstrap;
+use davidhirtz\yii2\cms\parent\helpers\EntryParentFromRequest;
 use Yii;
 use yii\base\Behavior;
 
@@ -37,11 +38,7 @@ class EntryParentActiveDataProviderBehavior extends Behavior
     public function onAfterPrepare()
     {
         if (!$this->owner->searchString) {
-            if (!$this->owner->parent) {
-                if ($parentId = Yii::$app->getRequest()->get('parent')) {
-                    $this->owner->parent = Entry::findOne((int)$parentId);
-                }
-            }
+            $this->owner->parent ??= EntryParentFromRequest::getParent();
 
             if($orderBy = $this->owner->parent?->getDescendantsOrder()) {
                 $this->owner->query->orderBy($orderBy);
