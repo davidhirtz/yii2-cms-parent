@@ -68,7 +68,7 @@ class ParentIdFieldBehavior extends Behavior
     public function findParentEntries()
     {
         $entries = Entry::find()
-            ->select($this->owner->model->getI18nAttributesNames(['id', 'parent_id', 'name', 'path', 'slug', 'parent_slug', 'entry_count']))
+            ->select($this->owner->model->getI18nAttributesNames(['id', 'parent_id', 'name', 'path', 'slug', 'parent_slug', 'entry_count', 'section_count']))
             ->whereHasDescendantsEnabled()
             ->orderBy(static::getModule()->defaultEntryOrderBy)
             ->indexBy('id')
