@@ -11,6 +11,21 @@ use davidhirtz\yii2\cms\models\Entry;
 class EntryQuery extends \davidhirtz\yii2\cms\models\queries\EntryQuery
 {
     /**
+     * Adds the translated slug target attribute to the query
+     * @return $this
+     */
+    public function selectSiteAttributes()
+    {
+        parent::selectSiteAttributes();
+
+        if ($slugTargetAttribute = Entry::instance()->slugTargetAttribute) {
+            $this->addSelect($this->prefixColumns(Entry::instance()->getI18nAttributesNames($slugTargetAttribute)));
+        }
+
+        return $this;
+    }
+
+    /**
      * @return $this
      */
     public function selectSitemapAttributes()
