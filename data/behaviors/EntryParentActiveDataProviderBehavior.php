@@ -40,8 +40,11 @@ class EntryParentActiveDataProviderBehavior extends Behavior
         if (!$this->owner->searchString) {
             $this->owner->parent ??= EntryParentFromRequest::getParent();
 
-            if($orderBy = $this->owner->parent?->getDescendantsOrder()) {
-                $this->owner->query->orderBy($orderBy);
+            // Set default order from parent entry, if no category order was set.
+            if (!$this->owner->category?->getEntryOrderBy()) {
+                if ($orderBy = $this->owner->parent?->getDescendantsOrder()) {
+                    $this->owner->query->orderBy($orderBy);
+                }
             }
 
             $this->owner->query->andWhere(['parent_id' => $this->owner->parent?->id]);
