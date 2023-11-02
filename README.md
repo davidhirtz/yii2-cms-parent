@@ -1,25 +1,7 @@
 README
 ============================
 
-[Yii 2](http://www.yiiframework.com/) extensions for [yii2-cms](https://github.com/davidhirtz/yii2-cms/) by David Hirtz.
-This extension extends the module to allow entries with hiearchy.
+As of version 2.0 of [Yii 2](http://www.yiiframework.com/) extension [yii2-cms](https://github.com/davidhirtz/yii2-cms/)
+this package is no longer needed. The functionality has been merged into the core extension.
 
-INSTALLATION
--------------
-
-The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
-
-```
-composer require davidhirtz/yii2-cms-parent
-```
-
-Make sure to run the migrations after the installation via `php yii migrate`.
-
-SETUP
--------------
-
-- Extend the default entry model `davidhirtz\yii2\cms\models\Entry`: It must make use of the`davidhirtz\yii2\skeleton\db\MaterializedTreeTrait` trait, otherwise the application will throw an error
-- Override `Entry::find()` to return an instance of `davidhirtz\yii2\cms\parent\models\queries\EntryQuery` instead of `davidhirtz\yii2\cms\models\queries\EntryQuery`
-- Make sure `app\modules\admin\widgets\forms\EntryActiveForm::$fields` includes `parent_id` to display the entries drop down
-- [Optional] Use `davidhirtz\yii2\cms\parent\widgets\grid\columns\EntryCountColumn` to display an entries counter in `davidhirtz\yii2\cms\modules\admin\widgets\grid\EntryGridView`
-- [Optional] Use `davidhirtz\yii2\cms\parent\widgets\nav\ParentSubmenuTrait` in `davidhirtz\yii2\cms\modules\admin\widgets\nav\Submenu`, follow the documention of the trait methods
+If you are using an version of yii2-cms prior to 2.0, lock this extension to version ^1.1 in your composer.json file.
