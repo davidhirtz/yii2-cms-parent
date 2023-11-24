@@ -117,6 +117,8 @@ class ParentIdFieldBehavior extends Behavior
      */
     public function getParentIdOptionDataValue($entry, $language = null)
     {
+        $language ??= Yii::$app->sourceLanguage;
+
         return Yii::$app->getI18n()->callback($language, function () use ($entry) {
             return rtrim(Yii::$app->getUrlManager()->createAbsoluteUrl($entry->getRoute()), '/') . '/';
         });
